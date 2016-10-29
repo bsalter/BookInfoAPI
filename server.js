@@ -1,5 +1,4 @@
 var express = require('express');
-var fs = require('fs');
 
 var app = express();
 
@@ -19,28 +18,24 @@ app.use(function(req, res, next){
     next();
 });
 
-app.get('/', function(req, res){
-    var file = fs.createReadStream('README.md');
-
-    file.pipe(markdownTrans()).pipe(res);
-    file.on("finished", function () {
-        res.end();
-    });
-});
-
 app.get('/reactions', function(req, res){
-    var query = req.query.q;
+    var query = req.query.book;
     if(typeof query == "undefined") {
         var errorobj = {"status": 414, "message": "No query parameter provided"};
         res.status(414).json(errorobj);
     } else {
-        var resobj = {"status":200, "result": this_translator.translateToEnglish(query).translation};
+        var resobj = {"status":200, "result": ""};
         res.json(resobj);
     }
 });
 
-app.post('/book', function(req, rest) {
-    var query = req.query.q;
+app.get('/timeframe', function(req, res) {
+    var query = req.query.request;
+
+});
+
+app.post('/book', function(req, res) {
+    var query = req.query.book;
     res.status(200);
 });
 
