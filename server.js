@@ -41,6 +41,7 @@ app.get('/book', function(req, res){
             if(typeof chapter !== "undefined") {
                 var reactions = [];
                 output.title = doc.title;
+                output.author = doc.author;
                 output._id = doc._id;
                 _.each(doc.reactions, function(reaction) {
                    if(reaction.chapter == chapter) {
@@ -63,14 +64,15 @@ app.post('/reaction', function(req, res) {
         res.status(404).json(errorobj);
     } else {
         var book = query.book;
+        var author = book.author;
         var title = book.title;
         var reaction = book.reaction;
         var timestamp = book.timestamp;
         var user = book.user;
         var chapter = book.chapter;
         db.collection('books').findOneAndUpdate(
-            { title: title },
-            { $set: { title: title },
+            { title: title, author: author },
+            { $set: { title: title, author: author },
               $push:
                 { reactions: { user: user, reaction: reaction, timestamp: timestamp, chapter: chapter }} },
             { upsert: true });
