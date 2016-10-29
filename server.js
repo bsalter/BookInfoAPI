@@ -15,7 +15,6 @@ MongoClient.connect(process.env.HEROKU_MONGO, function (err, database) {
     assert.equal(null, err);
     console.log("Connected successfully to server");
     db = database;
-    database.close();
 });
 
 app.use(function(req, res, next){
@@ -43,8 +42,14 @@ app.post('/reaction', function(req, res) {
         var book = query.book;
         var title = book.title;
         var reaction = book.reaction;
-        var time = book.timestamp;
+        var timestamp = book.timestamp;
         var user = book.user;
+        db.collection('books').findOneAndUpdate(
+            { "title": title },
+            { $set: { "title": title, "user": user },
+              $push:
+                { reactions: { reaction: reaction, timestamp: timestamp }} },
+            { upsert: true });
         res.status(200).json(book);
     }
 });
