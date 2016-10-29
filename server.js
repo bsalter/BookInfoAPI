@@ -84,7 +84,7 @@ app.use(function(req, res) {
     res.json(errorobj);
 });
 
-app.listen(process.env.NODE_PORT, function() {
-    console.log("Server started, listening on port " + process.env.NODE_PORT);
+app.listen(process.env.PORT, function() {
+    console.log("Server started, listening on port " + process.env.PORT);
 });
 
