@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var _ = require('underscore');
 
 var app = express();
 app.use(bodyParser.json());
@@ -30,12 +31,27 @@ app.use(function(req, res, next) {
 
 app.get('/book', function(req, res){
     var query = req.query.title;
+    var chapter = req.query.chapter;
     if(typeof query == "undefined") {
         var errorobj = {"status": 404, "message": "No query parameter provided"};
         res.status(404).json(errorobj);
     } else {
-        db.collection('books').findOne({ title: query }).then(function(doc) {
-            res.status(200).json(doc);
+        db.collection('books').findOne({title: query}).then(function (doc) {
+            var output = {};
+            if(typeof chapter !== "undefined") {
+                var reactions = [];
+                output.title = doc.title;
+                output._id = doc._id;
+                _.each(doc.reactions, function(reaction) {
+                   if(reaction.chapter == chapter) {
+                       reactions.push(reaction)
+                   }
+                });
+                output.reactions = reactions;
+            } else {
+                output = doc;
+            }
+            res.status(200).json(output);
         });
     }
 });
@@ -54,19 +70,13 @@ app.post('/reaction', function(req, res) {
         var chapter = book.chapter;
         db.collection('books').findOneAndUpdate(
             { title: title },
-            { $set: { title: title, user: user },
+            { $set: { title: title },
               $push:
-                { reactions: { reaction: reaction, timestamp: timestamp, chapter: chapter }} },
+                { reactions: { user: user, reaction: reaction, timestamp: timestamp, chapter: chapter }} },
             { upsert: true });
         res.status(200).json(book);
     }
 });
-
-/*
-app.get('/timeframe', function(req, res) {
-    var query = req.query.request;
-});
-*/
 
 app.use(function(req, res) {
     res.status(404);
