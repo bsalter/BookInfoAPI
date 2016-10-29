@@ -57,6 +57,12 @@ app.get('/book', function(req, res){
     }
 });
 
+app.get('/books', function(req, res) {
+    db.collection('books').find().toArray(function(err, docs) {
+        res.status(200).json(docs);
+    });
+});
+
 app.post('/reaction', function(req, res) {
     var query = req.body;
     if(typeof query == "undefined") {
@@ -89,4 +95,3 @@ app.use(function(req, res) {
 app.listen(process.env.PORT, function() {
     console.log("Server started, listening on port " + process.env.PORT);
 });
-
