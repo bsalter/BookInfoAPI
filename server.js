@@ -22,14 +22,21 @@ app.use(function(req, res, next){
     next();
 });
 
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
+
 app.get('/book', function(req, res){
-    var query = req.query.book;
+    var query = req.query.title;
     if(typeof query == "undefined") {
         var errorobj = {"status": 404, "message": "No query parameter provided"};
         res.status(404).json(errorobj);
     } else {
-        var resobj = {"status":200, "result": ""};
-        res.json(resobj);
+        db.collection('books').findOne({ title: query }).then(function(doc) {
+            res.status(200).json(doc);
+        });
     }
 });
 
@@ -44,11 +51,12 @@ app.post('/reaction', function(req, res) {
         var reaction = book.reaction;
         var timestamp = book.timestamp;
         var user = book.user;
+        var chapter = book.chapter;
         db.collection('books').findOneAndUpdate(
-            { "title": title },
-            { $set: { "title": title, "user": user },
+            { title: title },
+            { $set: { title: title, user: user },
               $push:
-                { reactions: { reaction: reaction, timestamp: timestamp }} },
+                { reactions: { reaction: reaction, timestamp: timestamp, chapter: chapter }} },
             { upsert: true });
         res.status(200).json(book);
     }
