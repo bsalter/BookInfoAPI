@@ -20,7 +20,7 @@
   "dependencies": {
     "body-parser": "^1.15.2",
     "express": "^4.13.3",
-    "mongodb": "^2.2.11",
+    "mongodb": "^3.6.1",
     "underscore": "^1.8.3"
   }
 }
